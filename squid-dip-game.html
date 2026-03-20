@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>Squid Dip</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -312,5 +312,55 @@ $('btnGiveup').addEventListener('click',()=>{
 
 init();
 </script>
+
+<style>
+/* ── Mobile viewport fit ── */
+@media (max-height: 700px), (max-width: 480px) {
+  body { justify-content: flex-start !important; overflow-y: auto !important; }
+  #wrap { transform-origin: top center; }
+}
+</style>
+<script>
+(function(){
+  function fitGame(){
+    const wrap = document.getElementById('wrap');
+    if(!wrap) return;
+    const btns = document.getElementById('controls') ||
+                 document.getElementById('ctrlBar') ||
+                 document.getElementById('dpad') ||
+                 document.getElementById('btns') ||
+                 document.getElementById('squidBar');
+    const hud  = document.getElementById('hud');
+
+    // Total natural height of all elements
+    const wrapH   = wrap.scrollHeight || wrap.offsetHeight;
+    const btnsH   = btns  ? btns.offsetHeight  : 0;
+    const hudH    = hud   ? hud.offsetHeight   : 0;
+    const padding = 16;
+    const totalH  = wrapH + btnsH + hudH + padding;
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    // Scale down wrap+canvas to fit height, never scale up
+    const scaleH = Math.min(1, (vh - btnsH - padding) / (wrapH + hudH || 1));
+    const scaleW = Math.min(1, vw / (wrap.offsetWidth || 480));
+    const scale  = Math.min(scaleH, scaleW);
+
+    if(scale < 1){
+      wrap.style.transform = 'scale(' + scale + ')';
+      wrap.style.transformOrigin = 'top center';
+      wrap.style.marginBottom = (wrapH * (scale - 1)) + 'px';
+    } else {
+      wrap.style.transform = '';
+      wrap.style.marginBottom = '';
+    }
+  }
+  window.addEventListener('load', fitGame);
+  window.addEventListener('resize', fitGame);
+  setTimeout(fitGame, 300);
+})();
+</script>
+
 </body>
 </html>
